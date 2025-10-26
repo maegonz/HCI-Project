@@ -119,9 +119,12 @@ class OneDollar(object):
     #########################################
     def rotateToZero(self, points):
         centroid = np.mean(points, 0)
-        newPoints = points      #remove this line, it is just for compilation
+        cx, cy = centroid
 
-        #todo
+        firstPx, firstPy = points[0]
+        teta = np.arctan2(cx - firstPx, cy - firstPy)
+
+        newPoints = self.rotateBy(points, -teta)
 
         return newPoints
 
@@ -129,6 +132,7 @@ class OneDollar(object):
     # TODO 6
     #########################################
     def rotateBy(self, points, angle):
+        centroid = np.mean(points, 0)
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
 
         #todo 6 update the vector newPoints
