@@ -133,9 +133,18 @@ class OneDollar(object):
     #########################################
     def rotateBy(self, points, angle):
         centroid = np.mean(points, 0)
+        cx, cy = centroid
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
 
         #todo 6 update the vector newPoints
+        for p in points:
+            px, py = p
+            
+            qx = (px - cx) * np.cos(angle) - (py - cy) * np.sin(angle) + cx
+            qy = (px - cx) * np.sin(angle) - (py - cy) * np.cos(angle) + cy
+            q = np.array([[qx, qy]])
+
+            np.concatenate((newPoints, q), axis=0)
 
         newPoints = newPoints[1:]       #remove the first point [0,0]
         return newPoints
