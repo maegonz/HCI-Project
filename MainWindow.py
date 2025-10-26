@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
                 self.add_template_thumbnail(gesture, name[label_index])
 
                 # todo 4 add the template to the one_dollar_recognizer
+                self.canvas.oneDollar.addTemplate(gesture, name[label_index])
 
                 if not all_gesture:
                     label = label_index
