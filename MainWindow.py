@@ -101,6 +101,8 @@ class MainWindow(QMainWindow):
         icon = QIcon(pix)
 
         #todo 3 create and add the corresponding item in the gallery
+        template = QListWidgetItem(label, icon)
+        self.gallery.addItem(template)
 
 
     #######################
