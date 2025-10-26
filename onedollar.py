@@ -121,8 +121,10 @@ class OneDollar(object):
         for i in range(template.shape[0]):
             points.append([template[i,0], template[i,1]])
         points = self.resample(points, numPoints)
+        print("After resample: ", len(points))
         self.resampled_templates.append( points )
         points = self.rotateToZero(points)
+        print("RotateToZero: ", points, points.shape)
         points = self.scaleToSquare(points)
         points = self.translateToOrigin(points)
         self.templates.append(points)
@@ -137,9 +139,11 @@ class OneDollar(object):
         cx, cy = centroid
 
         firstPx, firstPy = points[0]
+        print("RotateToZero fpx, fpy: ", firstPx, firstPy)
         teta = np.arctan2(cx - firstPx, cy - firstPy)
 
         newPoints = self.rotateBy(points, -teta)
+        print("RotateToZero NewPoints: ", newPoints)
 
         return newPoints
 
@@ -171,7 +175,6 @@ class OneDollar(object):
     def scaleToSquare(self, points):
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
         size = self.square_size
-        print(points)
         Bw = np.amax(points, axis=0) - np.amin(points, axis=0)  # longueur
         Bh = np.amax(points, axis=1) - np.amin(points, axis=1)  # largeur
 
