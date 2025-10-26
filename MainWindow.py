@@ -36,8 +36,8 @@ class MainWindow(QMainWindow):
         ################################
         # TODO 2: create the template gallery
         ###############################
-        #self.create_template_gallery()
-        #v_layout.addWidget( self.gallery )
+        self.gallery = self.create_template_gallery()
+        v_layout.addWidget( self.gallery )
 
         self.canvas = Canvas()
         v_layout.addWidget(self.canvas)
@@ -60,8 +60,9 @@ class MainWindow(QMainWindow):
         name = ["Triangle", "X", "Rectangle", "Circle", "Check", "Caret", "Question", "Arrow", "left square bracket",
                 "Right square bracket", "V", "Delete", "Left curly brace", "Right curly brace", "Star", "Pigtail"]
         #todo load the database
-        data = []
-        labels = []
+        d = pickle.load(open('./onedol_ds.pkl', 'rb'))
+        data = d['dataset']
+        labels = ['labels']
 
         label = -1
         all_gesture = False
@@ -81,9 +82,9 @@ class MainWindow(QMainWindow):
     def create_template_gallery(self):
         gallery = QListWidget()
         gallery.setFixedHeight(150)
-
-        #todo 2 customize the gallery
-
+        gallery.setViewMode(QListView.IconMode)
+        gallery.setUniformItemSizes(True)
+        gallery.setIconSize(QSize(50,50))
         return gallery
 
 
