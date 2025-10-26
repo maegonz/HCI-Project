@@ -62,13 +62,14 @@ class MainWindow(QMainWindow):
         #todo load the database
         d = pickle.load(open('./onedol_ds.pkl', 'rb'))
         data = d['dataset']
-        labels = ['labels']
+        labels = d['labels']
 
         label = -1
         all_gesture = False
         for gesture, label_index in zip(data, labels):
             if label_index != label:
                 # todo 3 add the template in the gallery
+                self.add_template_thumbnail(gesture, name[label_index])
 
                 # todo 4 add the template to the one_dollar_recognizer
 
@@ -91,17 +92,17 @@ class MainWindow(QMainWindow):
     ################################
     # TODO 3: fill the template gallery
     ###############################
-    def add_template_thumbnail(self, g, label):
+    def add_template_thumbnail(self, g, label: str):
 
         #draw the template path into a QIcon (icon)
         thumbnail_widget = GDrawer()
-        thumbnail_widget.set_gesture_path(g, label )
+        thumbnail_widget.set_gesture_path(g, label)
         pix = QPixmap(thumbnail_widget.size())
         thumbnail_widget.render(pix, QPoint(), QRegion(0, 0, thumbnail_widget.width(), thumbnail_widget.height()));
         icon = QIcon(pix)
 
         #todo 3 create and add the corresponding item in the gallery
-        template = QListWidgetItem(label, icon)
+        template = QListWidgetItem(icon, label)
         self.gallery.addItem(template)
 
 
