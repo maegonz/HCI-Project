@@ -28,6 +28,21 @@ class OneDollar(object):
         template_id = -1
         label = "None"
         score = 0
+        b = np.inf
+        
+        resampledPoints = self.resample(points)
+        rotatedPoints = self.rotateToZero(resampledPoints)
+        scaledPoints = self.scaleToSquare(rotatedPoints)
+
+        for id_t, (t, l) in enumerate((self.templates, self.labels)):
+            d = self.distanceAtBestAngle(scaledPoints, t, -45, 45, 2)
+            if d < b:
+                b = d
+                template_id = id_t
+                label = l
+        
+        size = self.square_size
+        score = 1 - b/(0.5 * np.sqrt(2 * size**2))
         return template_id, label, score
 
 
@@ -56,7 +71,7 @@ class OneDollar(object):
                 f_2 = self.distanceAtAngle(points, template, x_2)
 
         return min(f_1, f_2)
-        return min(f_1, f_2)
+        # return min(f_1, f_2)
 
     ####################
     def distanceAtAngle(self, points, template, angle):
@@ -68,7 +83,7 @@ class OneDollar(object):
 
 
     ####################
-    def resample(self, points, n):
+    def resample(self, points, n: int=64):
         # Get the length that should be between the returned points
         path_length = pathLength(points) / float(n - 1)
         newPoints = [points[0]]
@@ -156,6 +171,7 @@ class OneDollar(object):
     def scaleToSquare(self, points):
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
         size = self.square_size
+        print(points)
         Bw = np.amax(points, axis=0) - np.amin(points, axis=0)  # longueur
         Bh = np.amax(points, axis=1) - np.amin(points, axis=1)  # largeur
 
@@ -171,7 +187,6 @@ class OneDollar(object):
 
         newPoints = newPoints[1:]      #remove the first point [0,0]
         return newPoints
-
 
 
     ################################
