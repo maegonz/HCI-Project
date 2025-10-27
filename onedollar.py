@@ -1,8 +1,9 @@
 import numpy as np
 import numpy.linalg as linalg
+import matplotlib.pyplot as plt
 
 phi = 0.5 * (-1 + np.sqrt(5))
-numPoints = 128
+numPoints = 64
 
 
 class OneDollar(object):
@@ -30,18 +31,30 @@ class OneDollar(object):
         score = 0
         b = np.inf
         
-        resampledPoints = self.resample(points)
+        resampledPoints = self.resample(points, numPoints)
+        self.resampled_gesture = resampledPoints
         rotatedPoints = self.rotateToZero(resampledPoints)
         scaledPoints = self.scaleToSquare(rotatedPoints)
 
         for id_t, t in enumerate(self.templates):
-            d = self.distanceAtBestAngle(scaledPoints, t, -45, 45, 2)
-            if d < b:
-                b = d
+            print("##########################################")
+            print("current template :", id_t, self.labels[id_t])
+            dist = self.distanceAtBestAngle(scaledPoints, t, -45, 45, 2)
+            print("distance :", dist)
+            print("template returned :", template_id, self.labels[template_id])
+            print("is it inferieur :", dist < b)
+            if dist < b:
+                b = dist
                 template_id = id_t
+                print("========================")
+                print("template :", template_id, self.labels[template_id])
+                print("========================")
         
         size = self.square_size
-        label = self.labels[id_t]
+        print("size :", size)
+        print("almost scored :", 0.5 * np.sqrt(size**2 + size**2))
+        print("b value :", b)
+        label = self.labels[template_id]
         score = 1 - b/(0.5 * np.sqrt(2 * size**2))
         return template_id, label, score
 
@@ -83,7 +96,7 @@ class OneDollar(object):
 
 
     ####################
-    def resample(self, points, n: int=64):
+    def resample(self, points, n: int):
         # Get the length that should be between the returned points
         path_length = pathLength(points) / float(n - 1)
         newPoints = [points[0]]
@@ -122,9 +135,22 @@ class OneDollar(object):
             points.append([template[i,0], template[i,1]])
         points = self.resample(points, numPoints)
         self.resampled_templates.append( points )
+
+        # display(points, "Initial")
+        
         points = self.rotateToZero(points)
+
+        # display(points, "After, rotateTZ")
+        
         points = self.scaleToSquare(points)
+
+        # display(points, "After scaleToSquare")
+        
         points = self.translateToOrigin(points)
+
+        # display(points, "translateToOrigin")
+
+
         self.templates.append(points)
         self.labels.append(label)
 
@@ -175,6 +201,8 @@ class OneDollar(object):
         ly = [p[1] for p in points]
         Bw = np.max(lx) - np.min(lx)  # longueur
         Bh = np.max(ly) - np.min(ly)  # largeur
+
+        print("xxxxxxxxxxxxxxxxxxxxxxxxxxx :", Bw, Bh)
 
         #todo 7
         for p in points:
@@ -256,3 +284,20 @@ def pairwiseIterator(elems):
     for (i, j) in zip(elems, elems[1:]):
         yield (i, j)
     yield (elems[-1], elems[0])
+
+###############################
+########=== DEBUG ===##########    
+def display(points, title):
+    if isinstance(points, list):
+        x = [p[0] for p in points]
+        y = [p[1] for p in points]
+        plt.scatter(x, y)
+        plt.title(title)
+        plt.show()
+    else:
+        plt.scatter(points[:,0], points[:,1])
+        plt.title(title)
+        plt.show()
+
+###############################
+###############################
