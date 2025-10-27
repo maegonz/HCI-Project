@@ -37,23 +37,23 @@ class OneDollar(object):
         scaledPoints = self.scaleToSquare(rotatedPoints)
 
         for id_t, t in enumerate(self.templates):
-            print("##########################################")
-            print("current template :", id_t, self.labels[id_t])
+            # print("##########################################")
+            # print("current template :", id_t, self.labels[id_t])
             dist = self.distanceAtBestAngle(scaledPoints, t, -self.angle_range, self.angle_range, self.angle_step)
-            print("distance :", dist)
-            print("template returned :", template_id, self.labels[template_id])
-            print("is it inferieur :", dist < b)
+            # print("distance :", dist)
+            # print("template returned :", template_id, self.labels[template_id])
+            # print("is it inferieur :", dist < b)
             if dist < b:
                 b = dist
                 template_id = id_t
-                print("========================")
-                print("template :", template_id, self.labels[template_id])
-                print("========================")
+                # print("========================")
+                # print("template :", template_id, self.labels[template_id])
+                # print("========================")
         
         size = self.square_size
-        print("size :", size)
-        print("almost scored :", 0.5 * np.sqrt(size**2 + size**2))
-        print("b value :", b)
+        # print("size :", size)
+        # print("almost scored :", 0.5 * np.sqrt(size**2 + size**2))
+        # print("b value :", b)
         label = self.labels[template_id]
         score = 1 - b/(0.5 * np.sqrt(2 * size**2))
         return template_id, label, score
