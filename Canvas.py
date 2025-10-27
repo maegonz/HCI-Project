@@ -43,10 +43,14 @@ class Canvas(QWidget):
 
         self.animation = False
 
+        # self.counter = None
+
         #############################
         # TODO 11 create a timer
         # connect the timer to the sole timout
         #############################
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timeout)
 
 
 
@@ -91,8 +95,14 @@ class Canvas(QWidget):
         # self.path is the original gesture
         # self.feedback is the feedback path to animate
         # Weight should be within [0,1]
-        # self.feedback = interpolate(x1, y1, x2, x2, weight)
-
+        self.feedback = []
+        assert len(self.path) == len(self.termination), "self.path and self.termination should have the same lenght."
+        n = len(self.path)
+        for i, (p, t) in enumerate(zip(self.path, self.termination)):
+            weight = i / (n - 1)  # varie de 0 à 1
+            x1, y1 = p
+            x2, y2 = t.x(), t.y()
+            self.feedback.append(interpolate(x1, y1, x2, y2, weight))
 
         self.counter += 1
         self.repaint()
@@ -148,11 +158,13 @@ class Canvas(QWidget):
         self.termination = self.get_feedback(template_id)
 
         #todo 11
-        #self.path = ...
-        #self.feedback = self.path
+        self.path = self.oneDollar.resampled_gesture
+        self.feedback = self.path
 
         #create a timer
         self.counter = 0
+        self.timer.setInterval(60)
+        self.timer.start()
 
 
     ##############################
