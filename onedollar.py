@@ -171,8 +171,10 @@ class OneDollar(object):
     def scaleToSquare(self, points):
         newPoints = np.zeros((1, 2))    #initialize with a first point [0,0]
         size = self.square_size
-        Bw = np.amax(points, axis=0) - np.amin(points, axis=0)  # longueur
-        Bh = np.amax(points, axis=1) - np.amin(points, axis=1)  # largeur
+        lx = [p[0] for p in points]
+        ly = [p[1] for p in points]
+        Bw = np.max(lx) - np.min(lx)  # longueur
+        Bh = np.max(ly) - np.min(ly)  # largeur
 
         #todo 7
         for p in points:
@@ -180,6 +182,7 @@ class OneDollar(object):
             
             qx = px * (size/Bw)
             qy = py * (size/Bh)
+            print("qx, qy :", qx, qy)
             q = np.array([[qx, qy]])
 
             np.concatenate((newPoints, q), axis=0)
