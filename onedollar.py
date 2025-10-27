@@ -34,10 +34,7 @@ class OneDollar(object):
         rotatedPoints = self.rotateToZero(resampledPoints)
         scaledPoints = self.scaleToSquare(rotatedPoints)
 
-        print("Recognize :", self.templates)
-
         for id_t, t in enumerate(self.templates):
-            print(type(t), len(t), t)
             d = self.distanceAtBestAngle(scaledPoints, t, -45, 45, 2)
             if d < b:
                 b = d
@@ -126,11 +123,8 @@ class OneDollar(object):
         points = self.resample(points, numPoints)
         self.resampled_templates.append( points )
         points = self.rotateToZero(points)
-        print("add template rotateToZero:", points)
         points = self.scaleToSquare(points)
-        print("add template scaleTosquare:", points)
         points = self.translateToOrigin(points)
-        print("add template translateToOrigin:", points)
         self.templates.append(points)
         self.labels.append(label)
 
