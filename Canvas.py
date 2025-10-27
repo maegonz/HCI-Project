@@ -29,6 +29,7 @@ class Canvas(QWidget):
     ##########################
     # TODO 9: create a selected_template signal with three parameters: label, template_id, score
     ##########################
+    selected_template = Signal(str, int, float)
 
 
     def __init__(self, parent = None):
@@ -46,7 +47,6 @@ class Canvas(QWidget):
         # TODO 11 create a timer
         # connect the timer to the sole timout
         #############################
-
 
 
 
@@ -162,7 +162,7 @@ class Canvas(QWidget):
         print("template id: ", template_id, " label: ", label, " score: ", score)
 
         if score > 0.5:
-            #self.selected_template.emit(label, template_id, score)
+            self.selected_template.emit(label, template_id, score)
             self.display_feedback(template_id)
 
 
