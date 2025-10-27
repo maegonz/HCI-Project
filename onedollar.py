@@ -39,7 +39,7 @@ class OneDollar(object):
         for id_t, t in enumerate(self.templates):
             print("##########################################")
             print("current template :", id_t, self.labels[id_t])
-            dist = self.distanceAtBestAngle(scaledPoints, t, -45, 45, 2)
+            dist = self.distanceAtBestAngle(scaledPoints, t, -self.angle_range, self.angle_range, self.angle_step)
             print("distance :", dist)
             print("template returned :", template_id, self.labels[template_id])
             print("is it inferieur :", dist < b)
@@ -135,21 +135,9 @@ class OneDollar(object):
             points.append([template[i,0], template[i,1]])
         points = self.resample(points, numPoints)
         self.resampled_templates.append( points )
-
-        # display(points, "Initial")
-        
         points = self.rotateToZero(points)
-
-        # display(points, "After, rotateTZ")
-        
-        points = self.scaleToSquare(points)
-
-        # display(points, "After scaleToSquare")
-        
+        points = self.scaleToSquare(points)        
         points = self.translateToOrigin(points)
-
-        # display(points, "translateToOrigin")
-
 
         self.templates.append(points)
         self.labels.append(label)
@@ -163,7 +151,8 @@ class OneDollar(object):
         cx, cy = centroid
 
         firstPx, firstPy = points[0]
-        teta = np.arctan2(cx - firstPx, cy - firstPy)
+        teta = np.arctan2(cy - firstPy, cx - firstPx)
+        teta = teta * (180/np.pi)
 
         newPoints = self.rotateBy(points, -teta)
 
@@ -182,7 +171,7 @@ class OneDollar(object):
             px, py = p
             
             qx = (px - cx) * np.cos(angle) - (py - cy) * np.sin(angle) + cx
-            qy = (px - cx) * np.sin(angle) - (py - cy) * np.cos(angle) + cy
+            qy = (px - cx) * np.sin(angle) + (py - cy) * np.cos(angle) + cy
             q = np.array([[qx, qy]])
 
             newPoints = np.concatenate((newPoints, q), axis=0)
@@ -202,8 +191,6 @@ class OneDollar(object):
         Bw = np.max(lx) - np.min(lx)  # longueur
         Bh = np.max(ly) - np.min(ly)  # largeur
 
-        print("xxxxxxxxxxxxxxxxxxxxxxxxxxx :", Bw, Bh)
-
         #todo 7
         for p in points:
             px, py = p
@@ -215,6 +202,8 @@ class OneDollar(object):
             newPoints = np.concatenate((newPoints, q), axis=0)
 
         newPoints = newPoints[1:]      #remove the first point [0,0]
+        newPoints = self.translateToOrigin(newPoints)
+
         return newPoints
 
 
@@ -284,20 +273,3 @@ def pairwiseIterator(elems):
     for (i, j) in zip(elems, elems[1:]):
         yield (i, j)
     yield (elems[-1], elems[0])
-
-###############################
-########=== DEBUG ===##########    
-def display(points, title):
-    if isinstance(points, list):
-        x = [p[0] for p in points]
-        y = [p[1] for p in points]
-        plt.scatter(x, y)
-        plt.title(title)
-        plt.show()
-    else:
-        plt.scatter(points[:,0], points[:,1])
-        plt.title(title)
-        plt.show()
-
-###############################
-###############################
