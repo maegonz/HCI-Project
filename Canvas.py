@@ -145,7 +145,7 @@ class Canvas(QWidget):
     def display_feedback(self, template_id):
 
         #todo 10
-        #self.termination = ...
+        self.termination = self.get_feedback(template_id)
 
         #todo 11
         #self.path = ...
