@@ -96,14 +96,15 @@ class Canvas(QWidget):
         # self.feedback is the feedback path to animate
         # Weight should be within [0,1]
         self.feedback = []
-        assert len(self.path) == len(self.termination), "self.path and self.termination should have the same lenght."
+        assert len(self.path) == len(self.termination), f"self.path : {len(self.path)} and self.termination : {len(self.termination)} should have the same lenght."
         n = len(self.path)
         for i, (p, t) in enumerate(zip(self.path, self.termination)):
             weight = i / (n - 1)  # varie de 0 à 1
-            x1, y1 = p
+            x1, y1 = p.x(), p.y()
             x2, y2 = t.x(), t.y()
             self.feedback.append(interpolate(x1, y1, x2, y2, weight))
 
+        self.feedback = points_to_qpolygonF(self.feedback)
         self.counter += 1
         self.repaint()
 
@@ -158,13 +159,16 @@ class Canvas(QWidget):
         self.termination = self.get_feedback(template_id)
 
         #todo 11
-        self.path = self.oneDollar.resampled_gesture
-        self.feedback = self.path
+        # self.path = points_to_qpolygonF(self.oneDollar.resampled_gesture)
+        # self.feedback = self.path
 
-        #create a timer
-        self.counter = 0
-        self.timer.setInterval(60)
-        self.timer.start()
+        # #create a timer
+        # self.counter = 0
+        # self.animation = True
+        # self.timer.setInterval(60)
+        # self.timer.start()
+
+        self.update()
 
 
     ##############################
