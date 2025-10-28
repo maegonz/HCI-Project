@@ -3,6 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from onedollar import OneDollar
 import numpy as np
+import random as rd
 
 
 def points_to_qpolygonF(points):
@@ -87,7 +88,7 @@ class Canvas(QWidget):
     #TODO 11 create the animation
     ############################
     def timeout(self):
-        self.animation = True       #used in paintEvent to know whether it displays the traces or the animated feedback
+        self.animation = False       #used in paintEvent to know whether it displays the traces or the animated feedback
         nb_step = 50
 
         # TODO 11
@@ -96,17 +97,22 @@ class Canvas(QWidget):
         # self.feedback is the feedback path to animate
         # Weight should be within [0,1]
         self.feedback = []
-        assert len(self.path) == len(self.termination), f"self.path : {len(self.path)} and self.termination : {len(self.termination)} should have the same lenght."
         n = len(self.path)
         for i, (p, t) in enumerate(zip(self.path, self.termination)):
-            weight = i / (n - 1)  # varie de 0 à 1
+            weight = i/(n-1)  # varie de 0 à 1
             x1, y1 = p.x(), p.y()
             x2, y2 = t.x(), t.y()
             self.feedback.append(interpolate(x1, y1, x2, y2, weight))
 
-        self.feedback = points_to_qpolygonF(self.feedback)
+        self.path = points_to_qpolygonF(self.feedback)
         self.counter += 1
         self.repaint()
+
+        # stop the animation after nb_step iterations
+        if self.counter >= nb_step:
+            self.timer.stop()
+            self.feedback = QPolygonF() # optional, clean up
+            self.repaint()
 
 
     ############################
@@ -157,16 +163,16 @@ class Canvas(QWidget):
 
         #todo 10
         self.termination = self.get_feedback(template_id)
+        print(self.termination)
 
         #todo 11
-        # self.path = points_to_qpolygonF(self.oneDollar.resampled_gesture)
-        # self.feedback = self.path
+        self.path = points_to_qpolygonF(self.oneDollar.resampled_gesture)
+        self.feedback = self.path
 
         # #create a timer
-        # self.counter = 0
-        # self.animation = True
-        # self.timer.setInterval(60)
-        # self.timer.start()
+        self.counter = 0
+        self.timer.setInterval(100)
+        self.timer.start()
 
         self.update()
 
