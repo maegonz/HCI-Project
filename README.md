@@ -90,7 +90,7 @@ Ces fonctionnalités offrent une interaction fluide et intuitive.
   * Un **mode expert** (reconnaissance rapide classique),
   * Un **mode novice** (affichage progressif de tous les gestes disponibles après 500 ms d’attente).
 
-Cette amélioration n’a pas encore été développée dans la version actuelle.
+Cette amélioration n’a pas encore été développée dans la version actuelle. Néanmoins tout les gestes disponibles ton affichés après 500ms.
 
 ---
 
@@ -106,5 +106,6 @@ Cette amélioration n’a pas encore été développée dans la version actuelle
 
 ## 👤 Auteur
 
-Projet réalisé par **Antony MANUEL** à partir d'une base de code fournit par le professeur **Sylvain Malacria**, dans le cadre du cours de **3DTechnology**
+Projet réalisé par **Antony MANUEL** à partir d'une base de code fournit par le professeur **Sylvain Malacria**, dans le cadre du cours de **3DTechnology**.
+
 IMT Nord Europe — **2025–2026**
