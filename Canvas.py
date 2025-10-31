@@ -219,6 +219,7 @@ class Canvas(QWidget):
         Translate templates to start at the mouse press point (or center of widget)
         """
         self.novice_templates = []
+        scale_factor = 1.85
             
         # Anchor at mouse pressed point if available, else center of widget
         if self.path is not None and len(self.path) > 0:
@@ -230,11 +231,16 @@ class Canvas(QWidget):
             if template is None or len(template) < 2:
                 continue
 
+            # Scale template around its first point
+            cx, cy = template[0]
+            scaled = [[cx + (pt[0] - cx) * scale_factor,
+                       cy + (pt[1] - cy) * scale_factor] for pt in template]
+
             # Translate template so its first point matches the anchor (mouse press point)
-            t0x, t0y = template[0][0], template[0][1]
+            t0x, t0y = scaled[0]
             dx = anchor.x() - t0x
             dy = anchor.y() - t0y
-            translated = [[pt[0] + dx, pt[1] + dy] for pt in template]
+            translated = [[pt[0] + dx, pt[1] + dy] for pt in scaled]
 
             self.novice_templates.append(translated)
 
@@ -254,7 +260,7 @@ class Canvas(QWidget):
             color.setAlpha(64)  # 25% opacity
 
             # Draw the template polyline
-            painter.setPen(QPen(color, 8))
+            painter.setPen(QPen(color, 10))
             painter.setBrush(Qt.NoBrush)
             template_polygon = points_to_qpolygonF(template)
             if len(template_polygon) > 1:
