@@ -56,9 +56,9 @@ class Canvas(QWidget):
         #############################
         # Timer for gesture help display
         #############################
-        self.help_timer = QTimer()
-        self.help_timer.timeout.connect(self.show_gesture_help)
-        self.help_timer.setSingleShot(True)  # Only fire once
+        self.novice_timer = QTimer()
+        self.novice_timer.timeout.connect(self.show_gesture_help)
+        self.novice_timer.setSingleShot(True)  # Only fire once
         
         self.show_help = False
         self.help_templates = []  # Will store template polygons for display
@@ -93,9 +93,9 @@ class Canvas(QWidget):
                     p.drawPolyline(self.termination)
                     p.drawEllipse(self.termination[0], 2, 2)
 
-        # # Display available gestures when help is shown
-        # if self.show_help:
-        #     self.draw_gesture_help(p)
+        # Display available gestures when help is shown
+        if self.show_help:
+            self.draw_gesture_help(p)
 
 
     ############################
@@ -191,153 +191,91 @@ class Canvas(QWidget):
         self.update()
 
 
-    # ##############################
-    # def show_gesture_help(self):
-    #     """Called when help timer expires - prepares templates for display"""
-    #     self.show_help = True
-    #     self.prepare_help_templates()
-    #     self.repaint()
+    ##############################
+    def show_gesture_help(self):
+        """Called when help timer expires - prepares templates for display"""
+        self.show_help = True
+        self.prepare_help_templates()
+        self.repaint()
 
-    # ##############################
-    # def prepare_help_templates(self):
-    #     """Prepare scaled templates for help display"""
-    #     self.help_templates = []
-    #     canvas_width = self.width()
-    #     canvas_height = self.height()
+    ##############################
+    def prepare_help_templates(self):
+        """Prepare scaled templates for help display"""
+        self.help_templates = []
         
-    #     # Grid layout parameters
-    #     cols = 4  # Number of columns
-    #     rows = 4  # Number of rows
-    #     template_size = 80  # Size of each template display
-    #     padding = 20
-        
-    #     grid_width = cols * (template_size + padding)
-    #     grid_height = rows * (template_size + padding)
-        
-    #     start_x = (canvas_width - grid_width) // 2
-    #     start_y = (canvas_height - grid_height) // 2
-        
-    #     for i, (template, label) in enumerate(zip(self.oneDollar.resampled_templates, self.oneDollar.labels)):
-    #         if i >= cols * rows:  # Don't show more than grid can hold
-    #             break
-                
-    #         row = i // cols
-    #         col = i % cols
+        for i, (template, label) in enumerate(zip(self.oneDollar.resampled_templates, self.oneDollar.labels)):
             
-    #         # Calculate position for this template
-    #         x = start_x + col * (template_size + padding)
-    #         y = start_y + row * (template_size + padding)
-            
-    #         # Scale template to fit in the display area
-    #         scaled_template = self.scale_template_for_display(template, x, y, template_size)
-            
-    #         self.help_templates.append({
-    #             'template': scaled_template,
-    #             'label': label,
-    #             'x': x,
-    #             'y': y,
-    #             'size': template_size
-    #         })
+            self.help_templates.append(0)
 
-    # ##############################
-    # def scale_template_for_display(self, template, x, y, size):
-    #     """Scale a template to fit in the given display area"""
-    #     if not template:
-    #         return []
-            
-    #     # Convert template to numpy array for easier manipulation
-    #     points = np.array(template)
-        
-    #     # Get bounding box
-    #     min_x, min_y = np.min(points, axis=0)
-    #     max_x, max_y = np.max(points, axis=0)
-        
-    #     # Calculate scale to fit in the display area (with some padding)
-    #     template_width = max_x - min_x
-    #     template_height = max_y - min_y
-        
-    #     if template_width == 0 or template_height == 0:
-    #         return []
-            
-    #     scale_x = (size * 0.8) / template_width
-    #     scale_y = (size * 0.8) / template_height
-    #     scale = min(scale_x, scale_y)  # Use smaller scale to maintain aspect ratio
-        
-    #     # Scale and center the template
-    #     scaled_points = []
-    #     center_x = x + size // 2
-    #     center_y = y + size // 2
-        
-    #     template_center_x = (min_x + max_x) / 2
-    #     template_center_y = (min_y + max_y) / 2
-        
-    #     for point in points:
-    #         # Scale around template center
-    #         scaled_x = (point[0] - template_center_x) * scale
-    #         scaled_y = (point[1] - template_center_y) * scale
-            
-    #         # Translate to display position
-    #         final_x = center_x + scaled_x
-    #         final_y = center_y + scaled_y
-            
-    #         scaled_points.append([final_x, final_y])
-            
-    #     return scaled_points
 
-    # ##############################
-    # def draw_gesture_help(self, painter):
-    #     """Draw the gesture help overlay"""
-    #     # Draw semi-transparent background
-    #     painter.fillRect(self.rect(), QColor(0, 0, 0, 180))
-        
-    #     # Draw title
-    #     painter.setPen(QColor(255, 255, 255))
-    #     painter.setFont(QFont("Arial", 16, QFont.Bold))
-    #     title_rect = QRect(0, 20, self.width(), 30)
-    #     painter.drawText(title_rect, Qt.AlignCenter, "Available Gestures")
-        
-    #     # Draw instruction
-    #     painter.setFont(QFont("Arial", 10))
-    #     instruction_rect = QRect(0, 50, self.width(), 20)
-    #     painter.drawText(instruction_rect, Qt.AlignCenter, "Continue drawing to dismiss this help")
-        
-    #     # Draw templates
-    #     for template_info in self.help_templates:
-    #         template = template_info['template']
-    #         label = template_info['label']
-    #         x = template_info['x']
-    #         y = template_info['y']
-    #         size = template_info['size']
-            
-    #         # Draw template background
-    #         painter.setPen(QColor(100, 100, 100))
-    #         painter.setBrush(QColor(50, 50, 50, 100))
-    #         painter.drawRect(x, y, size, size)
-            
-    #         # Draw template path
-    #         if template:
-    #             painter.setPen(QPen(QColor(255, 255, 0), 2))
-    #             painter.setBrush(Qt.NoBrush)
-                
-    #             template_polygon = points_to_qpolygonF(template)
-    #             if len(template_polygon) > 1:
-    #                 painter.drawPolyline(template_polygon)
-    #                 # Draw start point
-    #                 painter.setBrush(QColor(255, 255, 0))
-    #                 painter.drawEllipse(template_polygon[0], 3, 3)
-            
-    #         # Draw label
-    #         painter.setPen(QColor(255, 255, 255))
-    #         painter.setFont(QFont("Arial", 8))
-    #         label_rect = QRect(x, y + size + 2, size, 15)
-    #         painter.drawText(label_rect, Qt.AlignCenter, label)
+    ##############################
+    # TODO 12 Draw each template with its label
+    ##############################
+    def draw_gesture_help(self, painter):
+        """Draw the gesture help overlay"""
+        # Anchor at mouse pressed point if available, else center of widget
+        if self.path is not None and len(self.path) > 0:
+            anchor = self.path[0]
+        else:
+            anchor = QPoint(self.width() // 2, self.height() // 2)
 
-    # ##############################
-    # def hide_novice_gesture(self):
-    #     """Hide the gesture help overlay"""
-    #     self.show_help = False
-    #     self.help_templates = []
-    #     self.repaint()
+        # Distinct colors to cycle through
+        base_colors = [
+            QColor(255, 0, 0),      # red
+            QColor(0, 128, 255),    # blue
+            QColor(0, 200, 0),      # green
+            QColor(255, 165, 0),    # orange
+            QColor(148, 0, 211),    # violet
+            QColor(255, 105, 180),  # hot pink
+            QColor(139, 69, 19),    # brown
+            QColor(0, 206, 209),    # teal
+            QColor(255, 215, 0),    # gold
+            QColor(128, 0, 128),    # purple
+        ]
+
+        for idx, (template, label) in enumerate(zip(self.oneDollar.resampled_templates, self.oneDollar.labels)):
+            if template is None or len(template) < 2:
+                continue
+
+            # Pick a color
+            color = base_colors[idx % len(base_colors)]
+
+            # Translate template so its first point matches the anchor (mouse press point)
+            t0x, t0y = template[0][0], template[0][1]
+            dx = anchor.x() - t0x
+            dy = anchor.y() - t0y
+            translated = [[pt[0] + dx, pt[1] + dy] for pt in template]
+
+            # Draw the template polyline
+            painter.setPen(QPen(color, 2))
+            painter.setBrush(Qt.NoBrush)
+            template_polygon = points_to_qpolygonF(translated)
+            if len(template_polygon) > 1:
+                painter.drawPolyline(template_polygon)
+                # Draw start point
+                painter.setBrush(color)
+                painter.drawEllipse(template_polygon[0], 3, 3)
+
+            # Compute bounding box for label placement above the template
+            xs = [pt[0] for pt in translated]
+            ys = [pt[1] for pt in translated]
+            if not xs or not ys:
+                continue
+            min_x, max_x = min(xs), max(xs)
+            min_y = min(ys)
+
+            # Draw label slightly above the template
+            painter.setPen(QPen(color))
+            painter.setFont(QFont("Arial", 9, QFont.Bold))
+            label_rect = QRectF(min_x, min_y - 18, max(40.0, (max_x - min_x)), 16)
+            painter.drawText(label_rect, Qt.AlignHCenter | Qt.AlignVCenter, label)
+
+    ##############################
+    def hide_novice_gesture(self):
+        """Hide the gesture help overlay"""
+        self.show_help = False
+        self.help_templates = []
+        self.repaint()
 
 
     ##############################
@@ -360,28 +298,29 @@ class Canvas(QWidget):
     ##############################
     def mousePressEvent(self,e):
         self.clear()
-        # self.hide_novice_gesture()  # Hide help when starting new gesture
+        self.hide_novice_gesture()  # Hide help when starting new gesture
         self.path.append( e.pos() )
         
-        # # Start the help timer for 500ms delay
-        # self.novice_timer.start(500)
+        # Start the help timer for 500ms delay
+        self.novice_timer.start(500)
         
         self.repaint()
 
     ##############################
     def mouseMoveEvent(self, e):
-        # # Stop the help timer if user continues drawing
-        # self.help_timer.stop()
-        # self.hide_gesture_help()
+        # TODO 12 Call the progressiv shading function here
+        # Stop the help timer if user continues drawing
+        self.novice_timer.stop()
+        self.hide_novice_gesture()
         
         self.path.append( e.pos() )
         self.repaint()
 
     ##############################
     def mouseReleaseEvent(self, e):
-        # # Stop the help timer when gesture is complete
-        # self.novice_timer.stop()
-        # self.hide_novice_gesture()
+        # Stop the help timer when gesture is complete
+        self.novice_timer.stop()
+        self.hide_novice_gesture()
         
         if self.path.size() > 10:
             self.recognize_gesture()
