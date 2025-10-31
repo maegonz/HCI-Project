@@ -77,6 +77,13 @@ class Canvas(QWidget):
         
         self.show_help = False
         self.novice_templates = []  # Will store template polygons for display
+        self.novice_labels = []  # Will store labels for display
+        self.keep_template = []  # Will store the kept templates
+
+        # Progressive shading state while drawing
+        self.current_template_id = None
+        self.current_score = 0.0
+        self.user_path_length = 0.0
 
 
 
@@ -208,7 +215,9 @@ class Canvas(QWidget):
 
     ##############################
     def show_gesture_help(self):
-        """Called when help timer expires - prepares templates for display"""
+        """
+        Called when help timer expires - prepares templates for display.
+        """
         self.show_help = True
         self.prepare_novice_templates()
         self.repaint()
@@ -216,7 +225,7 @@ class Canvas(QWidget):
     ##############################
     def prepare_novice_templates(self):
         """
-        Translate templates to start at the mouse press point (or center of widget)
+        Translate templates to start at the mouse press point (or center of widget).
         """
         self.novice_templates = []
         scale_factor = 1.85
@@ -260,7 +269,7 @@ class Canvas(QWidget):
             color.setAlpha(64)  # 25% opacity
 
             # Draw the template polyline
-            painter.setPen(QPen(color, 10))
+            painter.setPen(QPen(color, 8))
             painter.setBrush(Qt.NoBrush)
             template_polygon = points_to_qpolygonF(template)
             if len(template_polygon) > 1:
@@ -282,6 +291,34 @@ class Canvas(QWidget):
             painter.setFont(QFont("Arial", 9, QFont.Bold))
             label_rect = QRectF(min_x, min_y - 18, max(40.0, (max_x - min_x)), 16)
             painter.drawText(label_rect, Qt.AlignHCenter | Qt.AlignVCenter, label)
+
+
+    ##############################
+    def update_gesture_progress(self):
+        """Update selected template and path progress for progressive shading during drawing."""
+        # Compute current path length
+        path_points = qpolygonF_to_points(self.path)
+        if len(path_points) < 2:
+            self.user_path_length = 0.0
+            self.current_template_id = None
+            return
+
+        # Update measured user path length in pixels
+        def plength(pts):
+            return sum(((pts[i+1][0] - pts[i][0])**2 + (pts[i+1][1] - pts[i][1])**2) ** 0.5 for i in range(len(pts)-1))
+
+        self.user_path_length = plength(path_points)
+
+        # Recognize to select the best matching template id
+        try:
+            template_id, _, score = self.oneDollar.recognize(path_points)
+            self.current_template_id = template_id
+            self.current_score = score
+        except Exception:
+            # In case recognizer raises during early drawing
+            self.current_template_id = None
+            self.current_score = 0.0
+
 
     ##############################
     def hide_novice_gesture(self):
@@ -321,23 +358,25 @@ class Canvas(QWidget):
 
     ##############################
     def mouseMoveEvent(self, e):
-        # TODO 12 Call the progressiv shading function here
         # Stop the help timer if user continues drawing
         self.novice_timer.stop()
-        self.hide_novice_gesture()
 
-        self.path.append( e.pos() )
+        # Extend the current path, then update shading state
+        self.path.append(e.pos())
+        self.update_gesture_progress()
         self.repaint()
 
     ##############################
     def mouseReleaseEvent(self, e):
         # Stop the help timer when gesture is complete
-        self.novice_timer.stop()
-        self.hide_novice_gesture()
+        if self.show_help:
+            self.novice_timer.stop()
+            self.hide_novice_gesture()
         
-        if self.path.size() > 10:
-            self.recognize_gesture()
         else:
-            print("not enough points")
+            if self.path.size() > 10:
+                self.recognize_gesture()
+            else:
+                print("not enough points")
 
         self.repaint()
