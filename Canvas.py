@@ -24,6 +24,21 @@ def interpolate(x1, y1, x2, y2, weight):
     return (X,Y)
 
 
+# Distinct colors to cycle through
+base_colors = [
+    QColor(255, 0, 0),      # red
+    QColor(0, 128, 255),    # blue
+    QColor(0, 200, 0),      # green
+    QColor(255, 165, 0),    # orange
+    QColor(148, 0, 211),    # violet
+    QColor(255, 105, 180),  # hot pink
+    QColor(139, 69, 19),    # brown
+    QColor(0, 206, 209),    # teal
+    QColor(255, 215, 0),    # gold
+    QColor(128, 0, 128),    # purple
+]
+
+
 class Canvas(QWidget):
 
 
@@ -61,7 +76,7 @@ class Canvas(QWidget):
         self.novice_timer.setSingleShot(True)  # Only fire once
         
         self.show_help = False
-        self.help_templates = []  # Will store template polygons for display
+        self.novice_templates = []  # Will store template polygons for display
 
 
 
@@ -195,51 +210,25 @@ class Canvas(QWidget):
     def show_gesture_help(self):
         """Called when help timer expires - prepares templates for display"""
         self.show_help = True
-        self.prepare_help_templates()
+        self.prepare_novice_templates()
         self.repaint()
 
     ##############################
-    def prepare_help_templates(self):
-        """Prepare scaled templates for help display"""
-        self.help_templates = []
-        
-        for i, (template, label) in enumerate(zip(self.oneDollar.resampled_templates, self.oneDollar.labels)):
+    def prepare_novice_templates(self):
+        """
+        Translate templates to start at the mouse press point (or center of widget)
+        """
+        self.novice_templates = []
             
-            self.help_templates.append(0)
-
-
-    ##############################
-    # TODO 12 Draw each template with its label
-    ##############################
-    def draw_gesture_help(self, painter):
-        """Draw the gesture help overlay"""
         # Anchor at mouse pressed point if available, else center of widget
         if self.path is not None and len(self.path) > 0:
             anchor = self.path[0]
         else:
             anchor = QPoint(self.width() // 2, self.height() // 2)
 
-        # Distinct colors to cycle through
-        base_colors = [
-            QColor(255, 0, 0),      # red
-            QColor(0, 128, 255),    # blue
-            QColor(0, 200, 0),      # green
-            QColor(255, 165, 0),    # orange
-            QColor(148, 0, 211),    # violet
-            QColor(255, 105, 180),  # hot pink
-            QColor(139, 69, 19),    # brown
-            QColor(0, 206, 209),    # teal
-            QColor(255, 215, 0),    # gold
-            QColor(128, 0, 128),    # purple
-        ]
-
-        for idx, (template, label) in enumerate(zip(self.oneDollar.resampled_templates, self.oneDollar.labels)):
+        for template in self.oneDollar.resampled_templates:
             if template is None or len(template) < 2:
                 continue
-
-            # Pick a color
-            color = QColor(base_colors[idx % len(base_colors)])
-            color.setAlpha(64)  # 25% opacity
 
             # Translate template so its first point matches the anchor (mouse press point)
             t0x, t0y = template[0][0], template[0][1]
@@ -247,10 +236,27 @@ class Canvas(QWidget):
             dy = anchor.y() - t0y
             translated = [[pt[0] + dx, pt[1] + dy] for pt in template]
 
+            self.novice_templates.append(translated)
+
+
+    ##############################
+    # TODO 12 Draw each template with its label
+    ##############################
+    def draw_gesture_help(self, painter):
+        """Draw the gesture help overlay"""
+
+        for idx, (template, label) in enumerate(zip(self.novice_templates, self.oneDollar.labels)):
+            if template is None or len(template) < 2:
+                continue
+
+            # Pick a color
+            color = QColor(base_colors[idx % len(base_colors)])
+            color.setAlpha(64)  # 25% opacity
+
             # Draw the template polyline
             painter.setPen(QPen(color, 8))
             painter.setBrush(Qt.NoBrush)
-            template_polygon = points_to_qpolygonF(translated)
+            template_polygon = points_to_qpolygonF(template)
             if len(template_polygon) > 1:
                 painter.drawPolyline(template_polygon)
                 # Draw start point
@@ -258,8 +264,8 @@ class Canvas(QWidget):
                 painter.drawEllipse(template_polygon[0], 3, 3)
 
             # Compute bounding box for label placement above the template
-            xs = [pt[0] for pt in translated]
-            ys = [pt[1] for pt in translated]
+            xs = [pt[0] for pt in template]
+            ys = [pt[1] for pt in template]
             if not xs or not ys:
                 continue
             min_x, max_x = min(xs), max(xs)
@@ -275,7 +281,7 @@ class Canvas(QWidget):
     def hide_novice_gesture(self):
         """Hide the gesture help overlay"""
         self.show_help = False
-        self.help_templates = []
+        self.novice_templates = []
         self.repaint()
 
 
