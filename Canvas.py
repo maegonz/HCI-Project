@@ -238,7 +238,8 @@ class Canvas(QWidget):
                 continue
 
             # Pick a color
-            color = base_colors[idx % len(base_colors)]
+            color = QColor(base_colors[idx % len(base_colors)])
+            color.setAlpha(64)  # 25% opacity
 
             # Translate template so its first point matches the anchor (mouse press point)
             t0x, t0y = template[0][0], template[0][1]
@@ -247,7 +248,7 @@ class Canvas(QWidget):
             translated = [[pt[0] + dx, pt[1] + dy] for pt in template]
 
             # Draw the template polyline
-            painter.setPen(QPen(color, 2))
+            painter.setPen(QPen(color, 8))
             painter.setBrush(Qt.NoBrush)
             template_polygon = points_to_qpolygonF(translated)
             if len(template_polygon) > 1:
@@ -312,7 +313,7 @@ class Canvas(QWidget):
         # Stop the help timer if user continues drawing
         self.novice_timer.stop()
         self.hide_novice_gesture()
-        
+
         self.path.append( e.pos() )
         self.repaint()
 
