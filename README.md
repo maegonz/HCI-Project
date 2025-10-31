@@ -108,10 +108,3 @@ Cette amélioration n’a pas encore été développée dans la version actuelle
 
 Projet réalisé par **Antony MANUEL** à partir d'une base de code fournit par le professeur **Sylvain Malacria**, dans le cadre du cours de **3DTechnology**
 IMT Nord Europe — **2025–2026**
-
-```
-
----
-
-Souhaites-tu que je te personnalise ce `README.md` avec ton **nom**, ton **établissement**, et éventuellement **des captures d’écran** (je peux ajouter des sections d’images si tu veux) ?
-```
