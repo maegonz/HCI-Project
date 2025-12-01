@@ -1,111 +1,110 @@
-# HCI-Project : Implémentation du $1 Gesture Recognizer
+# HCI-Project: Implementation of the $1 Gesture Recognizer
 
-## 🎯 Objectif du projet
-L’objectif de ce projet est d’implémenter un système complet de reconnaissance de gestes basé sur l’algorithme **$1 Recognizer**, puis de développer une interface graphique permettant :
-- de visualiser une galerie de gestes (templates),
-- de dessiner un geste à la souris,
-- de reconnaître ce geste en temps réel,
-- et d’afficher un feedback visuel dynamique.
+## Project Objective
 
-Ce projet est réalisé en **Python** avec **PySide6** pour l’interface graphique et **NumPy** pour les calculs géométriques.
+The objective of this project is to implement a complete gesture recognition system based on the **$1 Recognizer** algorithm, and then develop a graphical interface allowing:
 
----
+  - visualization of a gesture gallery (templates),
+  - drawing a gesture with the mouse,
+  - recognizing this gesture in real-time,
+  - and displaying dynamic visual feedback.
 
-## 🧱 Structure du projet
+This project is built in **Python** using **PySide6** for the graphical interface and **NumPy** for geometric calculations.
 
-Le projet est composé des principaux fichiers suivants :
+-----
 
-- `MainWindow.py` — point d’entrée de l’application (classe principale et interface générale)
-- `Canvas.py` — gestion du tracé utilisateur, affichage du feedback et interaction avec le recognizer
-- `onedollar.py` — implémentation de l’algorithme de reconnaissance de gestes ($1 Recognizer)
-- `onedol_ds.pkl` — jeu de données contenant les templates de gestes (16 classes)
-- `resources/` — icônes, éventuels fichiers annexes
-- `README.md` — documentation du projet
+## Project Structure
 
----
+The project consists of the following main files:
 
-## ⚙️ Installation
+  - `MainWindow.py` — application entry point (main class and general interface)
+  - `Canvas.py` — user stroke management, feedback display, and interaction with the recognizer
+  - `onedollar.py` — implementation of the gesture recognition algorithm ($1 Recognizer)
+  - `onedol_ds.pkl` — dataset containing gesture templates (16 classes)
+  - `resources/` — icons, potential additional files
+  - `README.md` — project documentation
 
-### 1. Créer un environnement virtuel (recommandé)
+-----
+
+## Installation
+
+### 1\. Create a virtual environment (recommended)
+
 ```bash
 python -m venv venv
-source venv/bin/activate      # sous Linux / macOS
-venv\Scripts\activate         # sous Windows
-````
+source venv/bin/activate      # on Linux / macOS
+venv\Scripts\activate         # on Windows
+```
 
-### 2. Installer les dépendances
+### 2\. Install dependencies
 
 ```bash
 pip install numpy PySide6
 ```
 
-### 3. Lancer l’application
+### 3\. Launch the application
 
 ```bash
 python MainWindow.py
 ```
 
----
+-----
 
-## 🚀 Fonctionnalités implémentées
+## Implemented Features
 
-### 🧩 Partie 1 – Interface et galerie de templates
+### Part 1 – Interface and Template Gallery
 
-* **Étape 1 à 3 :**
+  * **Steps 1 to 3:**
+      * Loading the application skeleton (`MainWindow.py`)
+      * Creation of an icon gallery via `QListWidget`
+      * Loading templates from `onedol_ds.pkl`
+      * Displaying each template as a thumbnail with icon and label
 
-  * Chargement du squelette de l’application (`MainWindow.py`)
-  * Création d’une galerie d’icônes via `QListWidget`
-  * Chargement des templates depuis `onedol_ds.pkl`
-  * Affichage de chaque template sous forme de vignette avec icône et label
+### Part 2 – Implementation of the $1 Recognizer
 
-### 🧠 Partie 2 – Implémentation du $1 Recognizer
+  * **Step 4:** Adding templates to the recognition system (`addTemplate()` in `OneDollar`)
+  * **Steps 5 to 8:** Complete implementation of normalization steps:
+      * Point resampling (`resample()`)
+      * Rotation to the horizontal axis (`rotateToZero()`, `rotateBy()`)
+      * Scaling and translation to origin (`scaleToSquare()`)
+      * Gesture recognition (`recognize()`) with calculation of the minimum distance between the gesture and each template
 
-* **Étape 4 :** Ajout des templates au système de reconnaissance (`addTemplate()` dans `OneDollar`)
-* **Étape 5 à 8 :** Implémentation complète des étapes de normalisation :
+Result: the system displays the label of the recognized gesture with its similarity score in the console.
 
-  * Rééchantillonnage des points (`resample()`)
-  * Rotation vers l’axe horizontal (`rotateToZero()`, `rotateBy()`)
-  * Mise à l’échelle et translation à l’origine (`scaleToSquare()`)
-  * Reconnaissance du geste (`recognize()`) avec calcul de la distance minimale entre le geste et chaque template
+### Part 3 – Visual Feedback and User Interaction
 
-Résultat : le système affiche en console le label du geste reconnu avec son score de similarité.
+  * **Step 9:** Addition of a **PySide6 signal** emitted upon gesture recognition (`selected_template`)
+      * Connecting the signal to `set_action_on_gesture()` to automatically highlight the recognized template in the gallery
+  * **Step 10:** Displaying **static feedback** of the recognized template near the user's gesture
+  * **Step 11:** Adding **dynamic feedback** with animation using a `QTimer`, interpolating between the drawn gesture and the recognized template.
 
-### 💬 Partie 3 – Feedback visuel et interaction utilisateur
+These features provide fluid and intuitive interaction.
 
-* **Étape 9 :** Ajout d’un **signal PySide6** émis lors de la reconnaissance d’un geste (`selected_template`)
+-----
 
-  * Connexion du signal à `set_action_on_gesture()` pour surligner automatiquement le template reconnu dans la galerie
-* **Étape 10 :** Affichage d’un **feedback statique** du template reconnu à proximité du geste de l’utilisateur
-* **Étape 11 :** Ajout d’un **feedback dynamique** avec animation grâce à un `QTimer`, interpolant entre le geste dessiné et le template reconnu.
+## Part 4 – Octopocus (Not Implemented)
 
-Ces fonctionnalités offrent une interaction fluide et intuitive.
+  * **Step 12 (in progress / not implemented):**
+    The objective of this step is to add an **Octopocus** type interaction, allowing:
+      * An **expert mode** (classic fast recognition),
+      * A **novice mode** (progressive display of all available gestures after a 500 ms wait).
 
----
+This improvement has not yet been developed in the current version. However, all available gestures are displayed after 500ms.
 
-## 🔄 Partie 4 – Octopocus (non réalisée)
+-----
 
-* **Étape 12 (en cours / non implémentée) :**
-  L’objectif de cette étape est d’ajouter une interaction de type **Octopocus**, permettant :
+## Results
 
-  * Un **mode expert** (reconnaissance rapide classique),
-  * Un **mode novice** (affichage progressif de tous les gestes disponibles après 500 ms d’attente).
+At this stage:
 
-Cette amélioration n’a pas encore été développée dans la version actuelle. Néanmoins tout les gestes disponibles ton affichés après 500ms.
+  * The system correctly recognizes gestures among the 16 available classes.
+  * The user receives visual feedback (static and dynamic).
+  * The interface is fully functional and stable.
 
----
+-----
 
-## 🧪 Résultats
+## Author
 
-À ce stade :
-
-* Le système reconnaît correctement les gestes parmi les 16 classes disponibles.
-* L’utilisateur reçoit un retour visuel (statique et dynamique).
-* L’interface est entièrement fonctionnelle et stable.
-
----
-
-## 👤 Auteur
-
-Projet réalisé par **Antony MANUEL** à partir d'une base de code fournit par le professeur **Sylvain Malacria**, dans le cadre du cours de **3DTechnology**.
+Project created by **Antony Manuel** based on a codebase provided by Professor **Sylvain Malacria**, as part of the **3DTechnology** course.
 
 IMT Nord Europe — **2025–2026**
