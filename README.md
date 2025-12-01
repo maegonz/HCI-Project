@@ -28,21 +28,13 @@ The project consists of the following main files:
 
 ## Installation
 
-### 1\. Create a virtual environment (recommended)
-
-```bash
-python -m venv venv
-source venv/bin/activate      # on Linux / macOS
-venv\Scripts\activate         # on Windows
-```
-
-### 2\. Install dependencies
+### 1\. Install dependencies
 
 ```bash
 pip install numpy PySide6
 ```
 
-### 3\. Launch the application
+### 2\. Launch the application
 
 ```bash
 python MainWindow.py
