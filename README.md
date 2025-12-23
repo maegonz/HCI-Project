@@ -1,4 +1,4 @@
-# HCI-Project: Implementation of the $1 Gesture Recognizer
+# Implementation of the $1 Gesture Recognizer
 
 ## Project Objective
 
