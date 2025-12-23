@@ -93,6 +93,8 @@ At this stage:
   * The user receives visual feedback (static and dynamic).
   * The interface is fully functional and stable.
 
+![result_example](./result/result.git)
+
 -----
 
 ## Author
